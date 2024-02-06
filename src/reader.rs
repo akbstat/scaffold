@@ -3,6 +3,7 @@ use std::path::Path;
 use self::{adam_spec::AdamSpecReader, sdtm_spec::SdtmSpecReader, top::TopReader};
 
 mod adam_spec;
+pub mod item;
 mod reader;
 mod sdtm_spec;
 mod top;

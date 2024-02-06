@@ -1,3 +1,5 @@
+use super::item::ConfigItem;
+
 pub enum Kind {
     SDTM,
     ADAM,
@@ -5,5 +7,5 @@ pub enum Kind {
 }
 
 pub trait ConfigReader {
-    fn read(&self) -> anyhow::Result<Vec<(String, bool)>>;
+    fn read(&self) -> anyhow::Result<Vec<ConfigItem>>;
 }

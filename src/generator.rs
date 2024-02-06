@@ -1,11 +1,11 @@
-use crate::reader::{new_reader, Kind};
+use crate::reader::{item::ConfigItem, new_reader, Kind};
 use crate::render::{Item, Render};
 use anyhow::Ok;
 use chrono::Local;
 use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Group {
     Dev,
     Qc,
@@ -19,7 +19,7 @@ pub struct Param {
 }
 
 pub struct Generator {
-    items: Vec<(String, bool)>,
+    items: Vec<ConfigItem>,
     template: Render,
     kind: Kind,
 }
@@ -42,7 +42,15 @@ impl Generator {
             fs::create_dir_all(dest)?;
         }
         let current = Local::now().format("%e%b%Y").to_string().to_uppercase();
-        for (name, supp) in &self.items {
+        for ConfigItem {
+            name,
+            supp,
+            qc_required,
+        } in &self.items
+        {
+            if (!qc_required) && Group::Qc.eq(&param.group) {
+                continue;
+            }
             let item = Item {
                 name: name.into(),
                 study: param.study.clone(),
@@ -165,7 +173,7 @@ mod tests {
             engine: "SAS EG".into(),
             group: Group::Qc,
         };
-        let config = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\specs\top-ak112-303-CSR.xlsx");
+        let config = Path::new(r"D:\Studies\ak112\303\stats\CSR\utility\top-ak112-303-CSR.xlsx");
         let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");
         let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\dev");
         let qc_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\qc");

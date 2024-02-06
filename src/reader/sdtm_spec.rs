@@ -1,4 +1,4 @@
-use super::reader::ConfigReader;
+use super::{item::ConfigItem, reader::ConfigReader};
 use calamine::{open_workbook, DataType::Empty, Reader, Xlsx};
 use std::path::{Path, PathBuf};
 
@@ -21,9 +21,10 @@ impl SdtmSpecReader {
 }
 
 impl ConfigReader for SdtmSpecReader {
-    fn read(&self) -> anyhow::Result<Vec<(String, bool)>> {
-        let mut domains: Vec<(String, bool)> = vec![];
+    fn read(&self) -> anyhow::Result<Vec<ConfigItem>> {
+        let mut domains: Vec<ConfigItem> = vec![];
         let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
+        let qc_required = true;
 
         let range = workbook.worksheet_range(CONTENT)?;
         for (n, row) in range.rows().into_iter().enumerate() {
@@ -59,7 +60,11 @@ impl ConfigReader for SdtmSpecReader {
                     }
                 }
             }
-            domains.push((domain.to_lowercase(), supp));
+            domains.push(ConfigItem {
+                name: domain.to_lowercase(),
+                supp,
+                qc_required,
+            });
         }
         Ok(domains)
     }
