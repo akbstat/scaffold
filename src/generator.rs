@@ -16,12 +16,19 @@ pub struct Param {
     pub study: String,
     pub engine: String,
     pub group: Group,
+    pub custom_code: String,
 }
 
 pub struct Generator {
     items: Vec<ConfigItem>,
     template: Render,
     kind: Kind,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FileResult {
+    name: String,
+    existed: bool,
 }
 
 impl Generator {
@@ -34,7 +41,8 @@ impl Generator {
             kind,
         })
     }
-    pub fn render(&self, mut dest: &Path, param: &Param) -> anyhow::Result<()> {
+    pub fn render(&self, mut dest: &Path, param: &Param) -> anyhow::Result<Vec<FileResult>> {
+        let mut result = vec![];
         if dest.is_file() {
             dest = dest.parent().unwrap();
         }
@@ -60,6 +68,7 @@ impl Generator {
                 description: "Create".into(),
                 supp: *supp,
                 developer: "    ".into(),
+                slot: vec![param.custom_code.clone()],
             };
             let template = format!(
                 "{}/{}",
@@ -70,10 +79,16 @@ impl Generator {
                 },
                 group_template("v1", &param.group)
             );
-            self.template
-                .render(&template, &item, &dest.join(filename(name, &param.group)))?;
+            let filename = filename(name, &param.group);
+            let existed = self
+                .template
+                .render(&template, &item, &dest.join(&filename))?;
+            result.push(FileResult {
+                name: filename,
+                existed,
+            })
         }
-        Ok(())
+        Ok(result)
     }
 }
 
@@ -123,11 +138,13 @@ mod tests {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
+            custom_code: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
+            custom_code: "".into(),
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 SDTM Specification v0.2.xlsx",
@@ -145,11 +162,13 @@ mod tests {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
+            custom_code: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
+            custom_code: "".into(),
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 ADaM Specification v0.2.xlsx",
@@ -167,11 +186,13 @@ mod tests {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
+            custom_code: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
+            custom_code: "".into(),
         };
         let config = Path::new(r"D:\Studies\ak112\303\stats\CSR\utility\top-ak112-303-CSR.xlsx");
         let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");

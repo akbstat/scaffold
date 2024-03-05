@@ -13,6 +13,7 @@ pub struct Item {
     pub description: String,
     pub supp: bool,
     pub developer: String,
+    pub slot: Vec<String>,
 }
 
 pub struct Render {
@@ -30,7 +31,8 @@ impl Render {
         ))?;
         Ok(Render { template })
     }
-    pub fn render(&self, template: &str, item: &Item, dest: &Path) -> anyhow::Result<()> {
+    /// if file already existed before created, return true, else return false
+    pub fn render(&self, template: &str, item: &Item, dest: &Path) -> anyhow::Result<bool> {
         let mut ctx = Context::new();
         ctx.insert("item", item);
         let mut data = self
@@ -42,10 +44,11 @@ impl Render {
         data.insert(0, 239);
         data.insert(1, 187);
         data.insert(2, 191);
-        if !dest.exists() {
+        let file_existed = dest.exists();
+        if !file_existed {
             fs::write(dest, data)?;
         }
-        Ok(())
+        Ok(file_existed)
     }
 }
 
@@ -66,6 +69,7 @@ mod tests {
             description: "Create".into(),
             supp: true,
             developer: "yuki".into(),
+            slot: vec!["test1".into(), "test2".into()],
         };
         let dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\lb.sas");
         sdtm.render("sdtm/dev.v1", &item, dest).unwrap();
@@ -86,6 +90,7 @@ mod tests {
             description: "Create".into(),
             supp: true,
             developer: "yuki".into(),
+            slot: vec![],
         };
         let dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\adsl.sas");
         sdtm.render("adam/dev.v1", &item, dest).unwrap();
@@ -106,6 +111,7 @@ mod tests {
             description: "Create".into(),
             supp: true,
             developer: "yuki".into(),
+            slot: vec![],
         };
         let dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\l-16-02-07-06-irae-ss.sas");
         sdtm.render("tfls/dev.v1", &item, dest).unwrap();
