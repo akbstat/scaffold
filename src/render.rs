@@ -69,7 +69,7 @@ mod tests {
             description: "Create".into(),
             supp: true,
             developer: "yuki".into(),
-            slot: vec!["test1".into(), "test2".into()],
+            slot: vec!["%format".into(), "%checklog".into()],
         };
         let dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\lb.sas");
         sdtm.render("sdtm/dev.v1", &item, dest).unwrap();
@@ -90,7 +90,7 @@ mod tests {
             description: "Create".into(),
             supp: true,
             developer: "yuki".into(),
-            slot: vec![],
+            slot: vec!["%format".into(), "%checklog".into()],
         };
         let dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\adsl.sas");
         sdtm.render("adam/dev.v1", &item, dest).unwrap();
@@ -111,7 +111,7 @@ mod tests {
             description: "Create".into(),
             supp: true,
             developer: "yuki".into(),
-            slot: vec![],
+            slot: vec!["%format".into(), "%checklog".into()],
         };
         let dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\l-16-02-07-06-irae-ss.sas");
         sdtm.render("tfls/dev.v1", &item, dest).unwrap();

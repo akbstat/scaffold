@@ -16,7 +16,7 @@ pub struct Param {
     pub study: String,
     pub engine: String,
     pub group: Group,
-    pub custom_code: String,
+    pub custom_code: Vec<String>,
 }
 
 pub struct Generator {
@@ -68,7 +68,7 @@ impl Generator {
                 description: "Create".into(),
                 supp: *supp,
                 developer: "    ".into(),
-                slot: vec![param.custom_code.clone()],
+                slot: param.custom_code.clone(),
             };
             let template = format!(
                 "{}/{}",
@@ -138,20 +138,20 @@ mod tests {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
-            custom_code: "".into(),
+            custom_code: vec!["%format".into(), "%checklog".into()],
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
-            custom_code: "".into(),
+            custom_code: vec!["%format".into(), "%checklog".into()],
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 SDTM Specification v0.2.xlsx",
         );
         let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");
-        let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\sdtm\dev");
-        let qc_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\sdtm\qc");
+        let dev_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\product\program\sdtm");
+        let qc_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\validation\program\sdtm");
         let g = Generator::new(config, template_dir, Kind::SDTM).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
@@ -162,13 +162,13 @@ mod tests {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
-            custom_code: "".into(),
+            custom_code: vec!["%format".into(), "%checklog".into()],
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
-            custom_code: "".into(),
+            custom_code: vec!["%format".into(), "%checklog".into()],
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 ADaM Specification v0.2.xlsx",
@@ -186,13 +186,13 @@ mod tests {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
-            custom_code: "".into(),
+            custom_code: vec!["".into()],
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
-            custom_code: "".into(),
+            custom_code: vec!["".into()],
         };
         let config = Path::new(r"D:\Studies\ak112\303\stats\CSR\utility\top-ak112-303-CSR.xlsx");
         let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");
