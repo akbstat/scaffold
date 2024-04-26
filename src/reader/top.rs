@@ -1,4 +1,9 @@
-use super::{item::ConfigItem, reader::ConfigReader};
+use super::{
+    errors::{OutputError, OUTPUT_NAME_EXCEED},
+    item::ConfigItem,
+    reader::ConfigReader,
+};
+use anyhow::anyhow;
 use calamine::{open_workbook, DataType::Empty, Reader, Xlsx};
 use std::path::{Path, PathBuf};
 
@@ -25,6 +30,7 @@ impl ConfigReader for TopReader {
         let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
         let supp = false;
         let mut qc_required = true;
+        let mut error_info = vec![];
 
         let range = workbook.worksheet_range(TOP)?;
         for (n, row) in range.rows().into_iter().enumerate() {
@@ -41,6 +47,14 @@ impl ConfigReader for TopReader {
             } else {
                 break;
             }
+
+            if output.len() > 30 {
+                error_info.push(OutputError {
+                    item: output.clone(),
+                    message: OUTPUT_NAME_EXCEED.into(),
+                });
+            }
+
             if let Some(e) = row.get(VALIDATION_LEVEL_COL_INDEX) {
                 qc_required = if e.as_string().unwrap().trim().eq("3") {
                     true
@@ -53,6 +67,10 @@ impl ConfigReader for TopReader {
                 supp,
                 qc_required,
             });
+        }
+        if error_info.len() > 0 {
+            let error_message = serde_json::to_string(&error_info)?;
+            return Err(anyhow!(error_message));
         }
         Ok(outputs)
     }

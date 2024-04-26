@@ -11,3 +11,4 @@ serde = { version = "1.0", features = ["derive"] }
 tera = "1.19.1"
 calamine = "0.23.1"
 chrono = "0.4.31"
+serde_json = "1.0.116"
