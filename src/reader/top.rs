@@ -11,6 +11,7 @@ const TOP: &str = "top";
 const OUTPUT_NAME_COL_INDEX: usize = 4;
 const VALIDATION_LEVEL_COL_INDEX: usize = 0;
 const TARGET_ROWS_START_INDEX: usize = 1;
+const MAX_EMPTY_ROW_COUNT: usize = 10;
 
 pub struct TopReader {
     filepath: PathBuf,
@@ -26,6 +27,7 @@ impl TopReader {
 
 impl ConfigReader for TopReader {
     fn read(&self) -> anyhow::Result<Vec<ConfigItem>> {
+        let mut empty_row_count = 0;
         let mut outputs: Vec<ConfigItem> = vec![];
         let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
         let supp = false;
@@ -41,7 +43,12 @@ impl ConfigReader for TopReader {
             let output;
             if let Some(e) = row.get(OUTPUT_NAME_COL_INDEX) {
                 if e.eq(&Empty) {
-                    break;
+                    if empty_row_count > MAX_EMPTY_ROW_COUNT {
+                        break;
+                    } else {
+                        empty_row_count += 1;
+                        continue;
+                    }
                 }
                 output = e.as_string().unwrap();
             } else {
