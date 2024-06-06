@@ -8,8 +8,9 @@ pub mod item;
 mod project;
 mod reader;
 mod sdtm_spec;
-mod top;
+pub mod top;
 
+pub use self::project::list_projects;
 pub use self::reader::Kind;
 
 pub fn new_reader(kind: &Kind, filepath: &Path) -> Box<dyn reader::ConfigReader> {

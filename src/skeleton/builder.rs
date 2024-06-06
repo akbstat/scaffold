@@ -53,9 +53,9 @@ mod skeleton_test {
     #[test]
     fn test_generate_skeleton() {
         let root = Path::new(r"D:\Studies");
-        let product_id = "ak101";
-        let trial_id = "202";
-        let purpose = "CSR";
+        let product_id = "ak105";
+        let trial_id = "302";
+        let purpose = "adhoc";
 
         let document_template =
             fs::read(r"D:\projects\rusty\mobius_kit\.config\document_skeleton.json").unwrap();

@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 pub const DOCUMENTS: &str = "documents";
-pub const STAT: &str = "stat";
+pub const STAT: &str = "stats";
 
 pub trait Skeleton {
     fn paths(&self) -> Vec<String>;
