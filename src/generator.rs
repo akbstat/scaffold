@@ -17,6 +17,7 @@ pub struct Param {
     pub engine: String,
     pub group: Group,
     pub custom_code: Vec<String>,
+    pub template: String,
 }
 
 pub struct Generator {
@@ -32,9 +33,9 @@ pub struct FileResult {
 }
 
 impl Generator {
-    pub fn new(config: &Path, template_dir: &Path, kind: Kind) -> anyhow::Result<Generator> {
+    pub fn new(config: &Path, kind: Kind) -> anyhow::Result<Generator> {
         let items = new_reader(&kind, config).read()?;
-        let template = Render::new(template_dir)?;
+        let template = Render::new()?;
         Ok(Generator {
             items,
             template,
@@ -70,19 +71,10 @@ impl Generator {
                 developer: "    ".into(),
                 slot: param.custom_code.clone(),
             };
-            let template = format!(
-                "{}/{}",
-                match self.kind {
-                    Kind::SDTM => "sdtm",
-                    Kind::ADAM => "adam",
-                    Kind::TFL => "tfls",
-                },
-                group_template("v1", &param.group)
-            );
             let filename = filename(name, &param.group);
             let existed = self
                 .template
-                .render(&template, &item, &dest.join(&filename))?;
+                .render(&param.template, &item, &dest.join(&filename))?;
             result.push(FileResult {
                 name: filename,
                 existed,
@@ -96,13 +88,6 @@ fn filename(item: &str, group: &Group) -> String {
     match group {
         Group::Dev => format!("{}.sas", item),
         Group::Qc => format!("v-{}.sas", item),
-    }
-}
-
-fn group_template(version: &str, group: &Group) -> String {
-    match group {
-        Group::Dev => format!("dev.{}", version),
-        Group::Qc => format!("qc.{}", version),
     }
 }
 
@@ -139,20 +124,21 @@ mod tests {
             engine: "SAS EG".into(),
             group: Group::Dev,
             custom_code: vec!["%format".into(), "%checklog".into()],
+            template: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
             custom_code: vec!["%format".into(), "%checklog".into()],
+            template: "".into(),
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 SDTM Specification v0.2.xlsx",
         );
-        let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");
         let dev_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\product\program\sdtm");
         let qc_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\validation\program\sdtm");
-        let g = Generator::new(config, template_dir, Kind::SDTM).unwrap();
+        let g = Generator::new(config, Kind::SDTM).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
     }
@@ -163,20 +149,21 @@ mod tests {
             engine: "SAS EG".into(),
             group: Group::Dev,
             custom_code: vec!["%format".into(), "%checklog".into()],
+            template: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
             custom_code: vec!["%format".into(), "%checklog".into()],
+            template: "".into(),
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 ADaM Specification v0.2.xlsx",
         );
-        let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");
         let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\adam\dev");
         let qc_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\adam\qc");
-        let g = Generator::new(config, template_dir, Kind::ADAM).unwrap();
+        let g = Generator::new(config, Kind::ADAM).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
     }
@@ -187,18 +174,19 @@ mod tests {
             engine: "SAS EG".into(),
             group: Group::Dev,
             custom_code: vec!["".into()],
+            template: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
             custom_code: vec!["".into()],
+            template: "".into(),
         };
         let config = Path::new(r"D:\Studies\ak112\303\stats\CSR\utility\top-ak112-303-CSR.xlsx");
-        let template_dir = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\template");
         let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\dev");
         let qc_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\qc");
-        let g = Generator::new(config, template_dir, Kind::TFL).unwrap();
+        let g = Generator::new(config, Kind::TFL).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
     }
