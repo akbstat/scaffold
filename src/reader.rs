@@ -10,6 +10,7 @@ mod reader;
 mod sdtm_spec;
 pub mod top;
 
+pub use self::item::ConfigItem;
 pub use self::project::list_projects;
 pub use self::reader::Kind;
 
