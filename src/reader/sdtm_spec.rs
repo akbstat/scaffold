@@ -1,6 +1,9 @@
 use super::{item::ConfigItem, reader::ConfigReader};
 use calamine::{open_workbook, DataType::Empty, Reader, Xlsx};
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 
 const CONTENT: &str = "CONTENT";
 const SUPP_PREFIX: &str = "SUPP";
@@ -26,7 +29,11 @@ impl ConfigReader for SdtmSpecReader {
         let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
         let qc_required = true;
 
+        // a hash set to record if content sheet records supplymental domain(record their main domain instead)
+        let mut supp_exist: HashSet<String> = HashSet::new();
+
         let range = workbook.worksheet_range(CONTENT)?;
+
         for (n, row) in range.rows().into_iter().enumerate() {
             // skipping untarget rows
             if n < TARGET_ROWS_START_INDEX {
@@ -43,6 +50,7 @@ impl ConfigReader for SdtmSpecReader {
                 break;
             }
             if skip_supp(&domain) {
+                supp_exist.insert(domain.replace(SUPP_PREFIX, "").to_string());
                 continue;
             }
             // read domain detail sheet to find out if supp existed
@@ -60,12 +68,26 @@ impl ConfigReader for SdtmSpecReader {
                     }
                 }
             }
+
             domains.push(ConfigItem {
                 name: domain.to_lowercase(),
                 supp,
                 qc_required,
             });
         }
+
+        // if their is not supp appears in domain sheet, then try to find out in supp domain set declares in content sheet
+
+        for i in 0..domains.len() {
+            let domain = domains.get_mut(i).unwrap();
+            if !domain.supp {
+                if supp_exist.get(&domain.name.to_uppercase()).is_some() {
+                    domain.supp = true;
+                    // domains[i] = domain.clone();
+                }
+            }
+        }
+
         Ok(domains)
     }
 }

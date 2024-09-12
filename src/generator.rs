@@ -89,9 +89,9 @@ impl Generator {
                     format!("{}|dev", name)
                 };
                 if let Some(developer) = assignments.get(&task) {
-                    developer.to_string()
+                    format!("{:27}", developer.to_string())
                 } else {
-                    "    ".to_string()
+                    format!("{:27}", "")
                 }
             } else {
                 "    ".to_string()
@@ -155,22 +155,30 @@ mod tests {
     use super::*;
     #[test]
     fn sdtm_generate_test() {
+        let dev_template = fs::read_to_string(Path::new(
+            r"D:\projects\rusty\mobius_kit\.mocks\code\template\sdtm\dev.v1.sas",
+        ))
+        .unwrap();
+        let qc_template = fs::read_to_string(Path::new(
+            r"D:\projects\rusty\mobius_kit\.mocks\code\template\sdtm\qc.v1.sas",
+        ))
+        .unwrap();
         let dev = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Dev,
-            custom_code: vec!["%format".into(), "%checklog".into()],
-            template: "".into(),
+            custom_code: vec!["%format".into(), "%checklog".into(), "".into()],
+            template: dev_template,
         };
         let qc = Param {
             study: "AK112-303".into(),
             engine: "SAS EG".into(),
             group: Group::Qc,
-            custom_code: vec!["%format".into(), "%checklog".into()],
-            template: "".into(),
+            custom_code: vec!["%format".into(), "%checklog".into(), "".into()],
+            template: qc_template,
         };
         let config = Path::new(
-            r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 SDTM Specification v0.2.xlsx",
+            r"D:\Studies\ak112\303\documents\specs\AK112-303 SDTM Specification v0.2.xlsx",
         );
         let dev_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\product\program\sdtm");
         let qc_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\validation\program\sdtm");
