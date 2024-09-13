@@ -18,6 +18,7 @@ pub struct Param {
     pub engine: String,
     pub group: Group,
     pub custom_code: Vec<String>,
+    pub path: String,
     pub template: String,
 }
 
@@ -106,6 +107,7 @@ impl Generator {
                 supp: *supp,
                 developer,
                 slot: param.custom_code.clone(),
+                path: param.path.clone(),
             };
             let filename = filename(name, &param.group);
             let existed = self
@@ -169,6 +171,7 @@ mod tests {
             group: Group::Dev,
             custom_code: vec!["%format".into(), "%checklog".into(), "".into()],
             template: dev_template,
+            path: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
@@ -176,6 +179,7 @@ mod tests {
             group: Group::Qc,
             custom_code: vec!["%format".into(), "%checklog".into(), "".into()],
             template: qc_template,
+            path: "".into(),
         };
         let config = Path::new(
             r"D:\Studies\ak112\303\documents\specs\AK112-303 SDTM Specification v0.2.xlsx",
@@ -194,6 +198,7 @@ mod tests {
             group: Group::Dev,
             custom_code: vec!["%format".into(), "%checklog".into()],
             template: "".into(),
+            path: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
@@ -201,6 +206,7 @@ mod tests {
             group: Group::Qc,
             custom_code: vec!["%format".into(), "%checklog".into()],
             template: "".into(),
+            path: "".into(),
         };
         let config = Path::new(
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 ADaM Specification v0.2.xlsx",
@@ -219,6 +225,7 @@ mod tests {
             group: Group::Dev,
             custom_code: vec!["".into()],
             template: "".into(),
+            path: "".into(),
         };
         let qc = Param {
             study: "AK112-303".into(),
@@ -226,6 +233,7 @@ mod tests {
             group: Group::Qc,
             custom_code: vec!["".into()],
             template: "".into(),
+            path: "".into(),
         };
         let config = Path::new(r"D:\Studies\ak112\303\stats\CSR\utility\top-ak112-303-CSR.xlsx");
         let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\dev");

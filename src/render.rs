@@ -14,6 +14,7 @@ pub struct Item {
     pub supp: bool,
     pub developer: String,
     pub slot: Vec<String>,
+    pub path: String,
 }
 
 pub struct Render {}
