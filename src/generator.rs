@@ -92,10 +92,10 @@ impl Generator {
                 if let Some(developer) = assignments.get(&task) {
                     format!("{:27}", developer.to_string())
                 } else {
-                    format!("{:27}", "")
+                    format!("{:27}", " ")
                 }
             } else {
-                "    ".to_string()
+                format!("{:27}", " ")
             };
             let item = Item {
                 name: name.into(),
