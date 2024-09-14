@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use super::item::ConfigItem;
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 pub enum Kind {
     SDTM,
     ADAM,

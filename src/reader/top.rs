@@ -1,3 +1,5 @@
+use crate::Assignment;
+
 use super::{
     errors::{OutputError, OUTPUT_NAME_EXCEED},
     item::ConfigItem,
@@ -12,6 +14,8 @@ const OUTPUT_NAME_COL_INDEX: usize = 4;
 const VALIDATION_LEVEL_COL_INDEX: usize = 0;
 const TARGET_ROWS_START_INDEX: usize = 1;
 const MAX_EMPTY_ROW_COUNT: usize = 10;
+const SOURCER_COLUMN_INDEX: usize = 9;
+const QCER_COLUMN_INDEX: usize = 10;
 
 pub struct TopReader {
     filepath: PathBuf,
@@ -22,6 +26,47 @@ impl TopReader {
         TopReader {
             filepath: filepath.into(),
         }
+    }
+    pub fn assignement(&self) -> anyhow::Result<Vec<Assignment>> {
+        let mut result = vec![];
+        let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
+        let range = workbook.worksheet_range(TOP)?;
+        for (n, row) in range.rows().into_iter().enumerate() {
+            // skipping untarget rows
+            if n < TARGET_ROWS_START_INDEX {
+                continue;
+            }
+            let sourcer = if let Some(data) = row.get(SOURCER_COLUMN_INDEX) {
+                data.as_string()
+            } else {
+                None
+            };
+            let qcer = if let Some(data) = row.get(QCER_COLUMN_INDEX) {
+                data.as_string()
+            } else {
+                None
+            };
+            let task = if let Some(data) = row.get(OUTPUT_NAME_COL_INDEX) {
+                data.as_string()
+            } else {
+                None
+            };
+            if let Some(task) = task {
+                if let Some(sourcer) = sourcer {
+                    result.push(Assignment {
+                        developer: sourcer,
+                        task: format!("{}|dev", &task),
+                    });
+                }
+                if let Some(qcer) = qcer {
+                    result.push(Assignment {
+                        developer: qcer,
+                        task: format!("{}|qc", &task),
+                    });
+                }
+            }
+        }
+        Ok(result)
     }
 }
 
@@ -80,5 +125,19 @@ impl ConfigReader for TopReader {
             return Err(anyhow!(error_message));
         }
         Ok(outputs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn read_assignment_test() -> anyhow::Result<()> {
+        let p = Path::new(r"D:\Studies\ak101\202\stats\idmc\utility\top-ak112-303-CSR.xlsx");
+        let reader = TopReader::new(p);
+        let assignment = reader.assignement()?;
+        println!("{:?}", assignment);
+        assert!(assignment.len().gt(&0));
+        Ok(())
     }
 }

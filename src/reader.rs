@@ -1,5 +1,7 @@
 use std::path::Path;
 
+use crate::Assignment;
+
 use self::{adam_spec::AdamSpecReader, sdtm_spec::SdtmSpecReader, top::TopReader};
 
 mod adam_spec;
@@ -20,6 +22,11 @@ pub fn new_reader(kind: &Kind, filepath: &Path) -> Box<dyn reader::ConfigReader>
         Kind::ADAM => Box::new(AdamSpecReader::new(filepath)),
         Kind::TFL => Box::new(TopReader::new(filepath)),
     }
+}
+
+pub fn read_assignment_from_top(filepath: &Path) -> anyhow::Result<Vec<Assignment>> {
+    let reader = TopReader::new(filepath);
+    Ok(reader.assignement()?)
 }
 
 #[cfg(test)]
