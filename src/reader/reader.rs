@@ -10,5 +10,10 @@ pub enum Kind {
 }
 
 pub trait ConfigReader {
-    fn read(&self) -> anyhow::Result<Vec<ConfigItem>>;
+    /// ## read configution file and return a vector of ConfigItem
+    ///
+    /// ### Arguments
+    ///
+    /// @ force: bool - force to return config items even it contains errors, such as length of filename exceeds the limitation
+    fn read(&self, force: bool) -> anyhow::Result<Vec<ConfigItem>>;
 }

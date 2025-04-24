@@ -46,8 +46,9 @@ impl Generator {
         config: &Path,
         kind: Kind,
         assignment: Vec<Assignment>,
+        force: bool,
     ) -> anyhow::Result<Generator> {
-        let items = new_reader(&kind, config).read()?;
+        let items = new_reader(&kind, config).read(force)?;
         let template = Render::new()?;
         let assignment = if assignment.len() > 0 {
             let mut assign_map = HashMap::new();
@@ -186,7 +187,7 @@ mod tests {
         );
         let dev_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\product\program\sdtm");
         let qc_dest = Path::new(r"D:\Studies\ak112\303\stats\CSR\validation\program\sdtm");
-        let g = Generator::new(config, Kind::SDTM, vec![]).unwrap();
+        let g = Generator::new(config, Kind::SDTM, vec![], false).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
     }
@@ -213,7 +214,7 @@ mod tests {
         );
         let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\adam\dev");
         let qc_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\adam\qc");
-        let g = Generator::new(config, Kind::ADAM, vec![]).unwrap();
+        let g = Generator::new(config, Kind::ADAM, vec![], false).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
     }
@@ -238,7 +239,7 @@ mod tests {
         let config = Path::new(r"D:\Studies\ak112\303\stats\CSR\utility\top-ak112-303-CSR.xlsx");
         let dev_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\dev");
         let qc_dest = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\code\generated\tfl\qc");
-        let g = Generator::new(config, Kind::TFL, vec![]).unwrap();
+        let g = Generator::new(config, Kind::TFL, vec![], false).unwrap();
         g.render(dev_dest, &dev).unwrap();
         g.render(qc_dest, &qc).unwrap();
     }

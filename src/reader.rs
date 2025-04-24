@@ -38,7 +38,7 @@ mod tests {
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 SDTM Specification v0.2.xlsx",
         );
         let reader = new_reader(&Kind::SDTM, config);
-        let result = reader.read().unwrap();
+        let result = reader.read(false).unwrap();
         assert_eq!(result.len(), 37);
     }
     #[test]
@@ -47,14 +47,14 @@ mod tests {
             r"D:\projects\rusty\mobius_kit\.mocks\specs\AK112-303 ADaM Specification v0.2.xlsx",
         );
         let reader = new_reader(&Kind::ADAM, config);
-        let result = reader.read().unwrap();
+        let result = reader.read(false).unwrap();
         assert_eq!(result.len(), 17);
     }
     #[test]
     fn read_tfl_spec_test() {
         let config = Path::new(r"D:\projects\rusty\mobius_kit\.mocks\specs\top-ak112-303-CSR.xlsx");
         let reader = new_reader(&Kind::TFL, config);
-        let result = reader.read().unwrap();
+        let result = reader.read(false).unwrap();
         assert_eq!(result.len(), 144);
     }
 }

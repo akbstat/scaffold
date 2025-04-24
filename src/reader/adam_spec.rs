@@ -19,7 +19,7 @@ impl AdamSpecReader {
 }
 
 impl ConfigReader for AdamSpecReader {
-    fn read(&self) -> anyhow::Result<Vec<ConfigItem>> {
+    fn read(&self, _force: bool) -> anyhow::Result<Vec<ConfigItem>> {
         let mut domains: Vec<ConfigItem> = vec![];
         let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
         let supp = false;

@@ -71,7 +71,7 @@ impl TopReader {
 }
 
 impl ConfigReader for TopReader {
-    fn read(&self) -> anyhow::Result<Vec<ConfigItem>> {
+    fn read(&self, force: bool) -> anyhow::Result<Vec<ConfigItem>> {
         let mut empty_row_count = 0;
         let mut outputs: Vec<ConfigItem> = vec![];
         let mut workbook: Xlsx<_> = open_workbook(self.filepath.as_path())?;
@@ -100,7 +100,7 @@ impl ConfigReader for TopReader {
                 break;
             }
 
-            if output.len() > 30 {
+            if !force && output.len() > 30 {
                 error_info.push(OutputError {
                     item: output.clone(),
                     message: OUTPUT_NAME_EXCEED.into(),
