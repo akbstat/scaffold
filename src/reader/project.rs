@@ -9,11 +9,11 @@ const STAT: &str = "stats";
 pub struct Product {
     id: String,
     name: String,
-    trails: Vec<Trail>,
+    trials: Vec<Trial>,
 }
 
 #[derive(Debug, Serialize)]
-pub struct Trail {
+pub struct Trial {
     id: String,
     name: String,
     purpose: Vec<Purpose>,
@@ -34,13 +34,13 @@ pub fn list_projects(root: &Path) -> anyhow::Result<Vec<Product>> {
         .collect::<Vec<String>>();
     for product in product_list {
         let product_dir = root.join(&product);
-        let mut trails = vec![];
-        for trail in list_folders(&product_dir)? {
-            let trail_id = format!("{}-{}", &product, &trail);
-            let purposes = list_folders(product_dir.join(&trail).join(STAT).as_path())?;
-            let trail = Trail {
+        let mut trials = vec![];
+        for trial in list_folders(&product_dir)? {
+            let trail_id = format!("{}-{}", &product, &trial);
+            let purposes = list_folders(product_dir.join(&trial).join(STAT).as_path())?;
+            let trial = Trial {
                 id: trail_id.clone(),
-                name: trail,
+                name: trial,
                 purpose: purposes
                     .into_iter()
                     .map(|p| Purpose {
@@ -49,12 +49,12 @@ pub fn list_projects(root: &Path) -> anyhow::Result<Vec<Product>> {
                     })
                     .collect::<Vec<Purpose>>(),
             };
-            trails.push(trail);
+            trials.push(trial);
         }
         products.push(Product {
             id: product.clone(),
             name: product,
-            trails,
+            trials,
         })
     }
     Ok(products)
